@@ -38,7 +38,7 @@ import AppFeedbackKit
 struct YourApp: App {
     init() {
         AppFeedbackKit.configure(.init(
-            apiKey:    "afp_...",
+            apiKey:    "afk_...",
             apiSecret: "..."
         ))
     }

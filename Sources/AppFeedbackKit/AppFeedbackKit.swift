@@ -9,7 +9,7 @@ import SwiftUI
 ///     struct MyApp: App {
 ///         init() {
 ///             AppFeedbackKit.configure(
-///                 apiKey: "afp_...",
+///                 apiKey: "afk_...",
 ///                 apiSecret: "..."
 ///             )
 ///         }

@@ -15,6 +15,11 @@ enum AFPDeviceProbe {
 
     // ---------- Sync probe (cheap properties, suitable for every request) ----
 
+    /// `@MainActor` because we read UIScreen / UIApplication / the foreground
+    /// tracker, all of which are MainActor-isolated. Marking this here means
+    /// the SDK works in host apps regardless of their default-actor-isolation
+    /// build setting.
+    @MainActor
     static func snapshot(launches: Int, firstLaunch: Date?) -> [String: AFPJSONOut] {
         var out: [String: AFPJSONOut] = [:]
 

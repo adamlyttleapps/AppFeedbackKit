@@ -111,15 +111,23 @@ public final class AppFeedbackKit {
     /// `surface` defaults to .sheet for back-compat with existing call sites.
     /// Pass .banner from the FeedbackBanner so it can hide itself when the
     /// project is in "sheet only" mode (and vice versa).
+    ///
+    /// We always hit /api/eligibility (rather than short-circuiting on local
+    /// state) so the project's `debug_mode` flag can override local cooldowns
+    /// when the SDK author needs to test the flow on a device that's already
+    /// completed/dismissed.
     public func shouldPresent(_ surface: AFPSurface = .sheet) async -> Bool {
         guard config != nil else { return false }
-        if localCooldownActive { return false }
-        if storage.launchCount < (config?.minLaunchesBeforeAuto ?? 3) { return false }
         do {
             let resp: AFPEligibilityResponse = try await client.post(
                 path: "/api/eligibility",
                 body: AFPDeviceContext.current(launches: storage.launchCount)
             )
+            let bypass = resp.bypass_cooldown ?? false
+            if !bypass {
+                if localCooldownActive { return false }
+                if storage.launchCount < (config?.minLaunchesBeforeAuto ?? 3) { return false }
+            }
             guard resp.eligible else { return false }
             return Self.modeAllows(surface, mode: resp.presentation_mode)
         } catch {

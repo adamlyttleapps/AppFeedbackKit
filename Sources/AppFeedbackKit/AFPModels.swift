@@ -19,6 +19,7 @@ struct AFPDeviceContext: Encodable, Sendable {
     let meta: [String: AFPJSONOut]
     let subscriptions: [AFPJSONOut]
 
+    @MainActor
     static func current(launches: Int, firstLaunch: Date? = nil, subscriptions: [AFPJSONOut] = []) -> AFPDeviceContext {
         let snap = AFPDeviceProbe.snapshot(launches: launches, firstLaunch: firstLaunch)
         let app = snap["app_version"]?.stringValue ?? "0"
@@ -49,6 +50,9 @@ struct AFPEligibilityResponse: Decodable, Sendable {
     /// Server-controlled presentation mode: "sheet" / "banner" / "both".
     /// Defaults to "both" if the field is missing for back-compat.
     let presentation_mode: String?
+    /// When true, the SDK ignores its local cooldown / launch-count gates.
+    /// Set server-side via the project's debug_mode toggle. Used during dev.
+    let bypass_cooldown: Bool?
 }
 
 struct AFPProject: Decodable, Sendable {
@@ -221,6 +225,7 @@ enum AFPJSONOut: Encodable, Sendable {
 }
 
 extension AFPAnswerBody {
+    @MainActor
     static func make(questionId: Int, responseId: Int?, value: AFPJSONOut, skipped: Bool, launches: Int) -> AFPAnswerBody {
         let ctx = AFPDeviceContext.current(launches: launches)
         return AFPAnswerBody(

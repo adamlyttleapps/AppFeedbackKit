@@ -52,25 +52,17 @@ struct YourApp: App {
 }
 ```
 
-### 2. Pick a presentation surface
+### 2. (Optional) Manual triggering
+
+The default `.appFeedbackSheet()` modifier auto-presents based on the server's eligibility check. If you also want a "Send feedback" button somewhere in your app, bind a `@State` Bool:
 
 ```swift
-// Auto-presented sheet — opens itself when the user is eligible.
-ContentView().appFeedbackSheet()
-
-// Banner you place anywhere — taps to open the sheet. Hides itself when ineligible.
-ContentView().feedbackBanner()
-
-// Both:
-ContentView().appFeedbackSheet().feedbackBanner()
-
-// Manual: open the sheet from your own button.
 @State var showFeedback = false
+
 Button("Send feedback") { showFeedback = true }
+
 ContentView().appFeedbackSheet(isPresented: $showFeedback)
 ```
-
-The dashboard's **Audience** page lets you switch between sheet / banner / both server-side, so you can change your mind without shipping an app update.
 
 ## How it behaves
 

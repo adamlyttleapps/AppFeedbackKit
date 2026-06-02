@@ -82,6 +82,19 @@ final class AFPState: ObservableObject {
     /// event and skip the step — this is the forward-compat invariant.
     func submitAnswer(_ value: AFPJSONOut, skipped: Bool = false) async {
         guard let q = currentQuestion else { return }
+
+        if !skipped {
+            if q.type == "sean_ellis" {
+                if case .object(let dict) = value, case .string(let pick) = dict["choice"] {
+                    kit.config?.onSatisfaction?(.seanEllis(pick))
+                }
+            } else if q.type == "nps" {
+                if case .object(let dict) = value, case .int(let score) = dict["score"] {
+                    kit.config?.onSatisfaction?(.nps(score))
+                }
+            }
+        }
+
         do {
             let resp: AFPAnswerResponse = try await kit.client.post(
                 path: "/api/answer",

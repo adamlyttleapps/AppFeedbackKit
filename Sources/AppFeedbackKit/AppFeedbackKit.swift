@@ -29,6 +29,11 @@ public enum AFPSurface: String, Sendable {
     case banner
 }
 
+public enum AFPSatisfactionResult: Sendable {
+    case seanEllis(String)
+    case nps(Int)
+}
+
 /// Zero third-party dependencies — URLSession + Codable + SwiftUI only.
 @MainActor
 public final class AppFeedbackKit {
@@ -46,17 +51,20 @@ public final class AppFeedbackKit {
         /// every foreground as a launch; set very high to count only cold
         /// launches.
         public var relaunchAfterBackgroundSeconds: TimeInterval
+        public var onSatisfaction: (@Sendable (AFPSatisfactionResult) -> Void)?
 
         public init(
             apiKey: String,
             apiSecret: String,
             minLaunchesBeforeAuto: Int = 3,
-            relaunchAfterBackgroundSeconds: TimeInterval = 30 * 60
+            relaunchAfterBackgroundSeconds: TimeInterval = 30 * 60,
+            onSatisfaction: (@Sendable (AFPSatisfactionResult) -> Void)? = nil
         ) {
             self.apiKey = apiKey
             self.apiSecret = apiSecret
             self.minLaunchesBeforeAuto = minLaunchesBeforeAuto
             self.relaunchAfterBackgroundSeconds = relaunchAfterBackgroundSeconds
+            self.onSatisfaction = onSatisfaction
         }
     }
 
